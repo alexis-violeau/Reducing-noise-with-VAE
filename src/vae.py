@@ -4,7 +4,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 class Sampling(layers.Layer):
-    """Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
+    """Uses (z_mean, z_log_var) to sample z, the vector encoding a curve."""
 
     def call(self, inputs):
         z_mean, z_log_var = inputs
@@ -15,23 +15,23 @@ class Sampling(layers.Layer):
 
 
 class VAE(keras.Model):
+    """Variational autoencoder that learn to reconstruct denoised curves."""    
     def __init__(self, input_dim, **kwargs):
         super(VAE, self).__init__(**kwargs)
         
-        ## Constructing encoder
+        ## Constructing encoder from input space to latent space
         encoder_inputs = keras.Input(shape=(input_dim,))
-        
-        x = layers.Dense(128, activation="relu",name = 'hidden_layer_encoder_1',kernel_regularizer = 'l2')(encoder_inputs)
+        x = layers.Dense(128, activation="relu",name = 'hidden_layer_encoder',kernel_regularizer = 'l2')(encoder_inputs)
         
         z_mean = layers.Dense(2, activation = 'linear', name="z_mean")(x)
         z_log_var = layers.Dense(2, activation = 'linear', name="z_log_var")(x)
         z = Sampling()([z_mean, z_log_var])
+        
         self.encoder = keras.Model(encoder_inputs, [z_mean, z_log_var, z], name="encoder")
         
-        ## Constructing decoder
+        ## Constructing decoder from latent space to input space
         latent_inputs = keras.Input(shape=(2,))
-        
-        x = layers.Dense(128, activation="relu", name = 'hidden_layer_decoder_1',kernel_regularizer = 'l2')(latent_inputs)
+        x = layers.Dense(128, activation="relu", name = 'hidden_layer_decoder',kernel_regularizer = 'l2')(latent_inputs)
 
         decoder_outputs = layers.Dense(input_dim, activation="linear")(x)
         self.decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
@@ -52,6 +52,7 @@ class VAE(keras.Model):
         ]
 
     def train_step(self, data):
+        """Custom train step for VAE"""
 
         with tf.GradientTape() as tape:
             # First, we compute the forward pass

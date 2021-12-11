@@ -4,4 +4,4 @@ The experiment set up use sinusoides with random phases and white noise that are
 
 The goal is to show the kind of latent representation that a variational autoencoder can learn, and its efficiency to reconstruct denoised data.
 
-This tool can be used to remove noise and detect outliers within a dataset with strong hypothesis of consistency between the different sample (here, all shape are sinusoidal).
+This tool can be used to remove noise and detect outliers within a dataset with strong hypothesis of consistency between the different samples (here, all shapes are sinusoidal).
